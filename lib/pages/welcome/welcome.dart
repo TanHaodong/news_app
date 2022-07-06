@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:news_app/common/utils/utils.dart';
 import 'package:news_app/common/values/values.dart';
 
-
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
 
@@ -34,7 +33,7 @@ class _WelcomePageState extends State<WelcomePage> {
       width: duSetWidth(242),
       height: duSetHeight(70),
       margin: EdgeInsets.only(top: duSetHeight(14)),
-      child:  Text(
+      child: Text(
         "The best of news channels all in one place. Trusted sources and personalized new for you.",
         textAlign: TextAlign.center,
         style: TextStyle(
@@ -42,14 +41,14 @@ class _WelcomePageState extends State<WelcomePage> {
           fontFamily: "Avenir",
           fontWeight: FontWeight.normal,
           fontSize: duSetFontSize(16),
-          height: 1.3,  // 字间距
+          height: 1.3, // 字间距
         ),
       ),
     );
   }
 
   // 特性说明
-  Widget _buildFeatureItem(String imageName,String intro,double marginTop) {
+  Widget _buildFeatureItem(String imageName, String intro, double marginTop) {
     return Container(
       width: duSetWidth(295),
       height: duSetHeight(80),
@@ -95,9 +94,11 @@ class _WelcomePageState extends State<WelcomePage> {
         child: Text('Get Started'),
         shape: const RoundedRectangleBorder(
           // borderRadius: BorderRadius.all(Radius.circular(duSetWidth(6))),
-            borderRadius:Radii.k6pxRadius,
+          borderRadius: Radii.k6pxRadius,
         ),
-        onPressed: (){},
+        onPressed: () {
+          Navigator.pushNamed(context, "/sign-in"); // 以名字跳转
+        },
       ),
     );
   }
