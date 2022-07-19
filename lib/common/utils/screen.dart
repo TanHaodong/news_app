@@ -24,3 +24,4 @@ double duSetHeight(double height) {
 double duSetFontSize(double fontSize) {
   return ScreenUtil().setSp(fontSize);
 }
+

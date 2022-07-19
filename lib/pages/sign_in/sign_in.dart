@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/common/utils/screen.dart';
+import 'package:news_app/common/apis/apis.dart';
+import 'package:news_app/common/entitys/entitys.dart';
+import 'package:news_app/common/utils/utils.dart';
 import 'package:news_app/common/values/values.dart';
+import 'package:news_app/common/widgets/widgets.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({Key? key}) : super(key: key);
@@ -10,6 +13,44 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  // email 的控制组件
+  final TextEditingController _emailController = TextEditingController();
+
+  // 密码 的控制器
+  final TextEditingController _passController = TextEditingController();
+
+  // 跳转 注册页面
+  _handleNavSignUp() {
+    Navigator.pushNamed(
+      context,
+      "/sign-up",
+    );
+  }
+
+  // 执行登录操作
+  _handleSignIn() async {
+    if (!duIsEmail(_emailController.value.text)) {
+      toastInfo(msg: '请正确输入邮件');
+      return;
+    }
+    if (!duCheckStringLength(_passController.value.text, 6)) {
+      toastInfo(msg: '密码不能小于6位');
+      return;
+    }
+
+    UserRequestEntity params = UserRequestEntity(
+      email: _emailController.value.text,
+      password: duSHA256(_passController.value.text),
+    );
+
+    UserResponseEntity res = await UserAPI.login(params: params);
+
+    // 写本地 access_token , 不写全局，业务：离线登录
+    // 全局数据 gUser
+  }
+
+  // ------------------------------------------------------------
+
   // Logo
   Widget _buildLogo() {
     return Container(
@@ -88,81 +129,69 @@ class _SignInPageState extends State<SignInPage> {
       width: duSetWidth(295),
       // height: 204,
       margin: EdgeInsets.only(top: duSetHeight(49)),
-      child: Column(
-        children: [
-          // email input
-          inputTextEdit(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            hintText: "Email",
-            marginTop: 0,
-          ),
-          // password input
-          inputTextEdit(
-            controller: _passController,
-            keyboardType: TextInputType.visiblePassword,
-            hintText: "Password",
-            isPassword: true,
-          ),
-
-          // 注册、登录 横向布局
-          Container(
-            height: duSetHeight(44),
-            margin: EdgeInsets.only(top: duSetHeight(15)),
-            child: Row(
-              children: [
-                // 注册
-                btnFlatButtonWidget(
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      "/sign-up",
-                    );
-                  },
-                  gbColor: AppColors.thirdElement,
-                  title: "Sign up",
-                ),
-                Spacer(),
-                // 登录
-                btnFlatButtonWidget(
-                  onPressed: () {
-                    if (!duIsEmail(_emailController.value.text)) {
-                      toastInfo(msg: '请正确输入邮件');
-                      return;
-                    }
-                    if (!duCheckStringLength(_passController.value.text, 6)) {
-                      toastInfo(msg: '密码不能小于6位');
-                      return;
-                    }
-                  },
-                  gbColor: AppColors.primaryElement,
-                  title: "Sign in",
-                ),
-              ],
+      child: IntrinsicHeight(
+        child: Column(
+          children: [
+            // email input
+            inputTextEdit(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              hintText: "Email",
+              marginTop: 0,
             ),
-          ),
-          // Spacer(),
+            // password input
+            inputTextEdit(
+              controller: _passController,
+              keyboardType: TextInputType.visiblePassword,
+              hintText: "Password",
+              isPassword: true,
+            ),
 
-          // Fogot password
-          Container(
-            height: duSetHeight(22),
-            margin: EdgeInsets.only(top: duSetHeight(20)),
-            child: FlatButton(
-              onPressed: () => {},
-              child: Text(
-                "Fogot password?",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: AppColors.secondaryElementText,
-                  fontFamily: "Avenir",
-                  fontWeight: FontWeight.w400,
-                  fontSize: duSetFontSize(16),
-                  height: 1, // 设置下行高，否则字体下沉
+            // 注册、登录 横向布局
+            Container(
+              height: duSetHeight(44),
+              margin: EdgeInsets.only(top: duSetHeight(15)),
+              child: Row(
+                children: [
+                  // 注册
+                  btnFlatButtonWidget(
+                    onPressed: _handleNavSignUp,
+                    gbColor: AppColors.thirdElement,
+                    title: "Sign up",
+                  ),
+                  const Spacer(),
+                  // 登录
+                  btnFlatButtonWidget(
+                    onPressed:() => _handleSignIn(),
+                    gbColor: AppColors.primaryElement,
+                    title: "Sign in",
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+
+            // Forgot password
+            Container(
+              height: duSetHeight(22),
+              margin: EdgeInsets.only(top: duSetHeight(20)),
+              child: FlatButton(
+                onPressed: () => {},
+                child: Text(
+                  "Forgot password?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.secondaryElementText,
+                    fontFamily: "Avenir",
+                    fontWeight: FontWeight.w400,
+                    fontSize: duSetFontSize(16),
+                    height: 1, // 设置下行高，否则字体下沉
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -195,13 +224,13 @@ class _SignInPageState extends State<SignInPage> {
                   width: 88,
                   iconFileName: "twitter",
                 ),
-                Spacer(),
+                const Spacer(),
                 btnFlatButtonBorderOnlyWidget(
                   onPressed: () {},
                   width: 88,
                   iconFileName: "google",
                 ),
-                Spacer(),
+                const Spacer(),
                 btnFlatButtonBorderOnlyWidget(
                   onPressed: () {},
                   width: 88,
@@ -220,7 +249,7 @@ class _SignInPageState extends State<SignInPage> {
     return Container(
       margin: EdgeInsets.only(bottom: duSetHeight(20)),
       child: btnFlatButtonWidget(
-        onPressed: () {},
+        onPressed: _handleNavSignUp,
         width: 294,
         gbColor: AppColors.secondaryElement,
         fontColor: AppColors.primaryText,
@@ -240,7 +269,7 @@ class _SignInPageState extends State<SignInPage> {
           children: <Widget>[
             _buildLogo(),
             _buildInputForm(),
-            Spacer(),
+            const Spacer(),
             _buildThirdPartyLogin(),
             _buildSignUpButton(),
           ],
